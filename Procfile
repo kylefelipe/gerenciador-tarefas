@@ -1,1 +1,1 @@
-we: uvicorn --host=0.0.0.0 --port=$PORT gerenciador_tarefas.gerencidador:app
+web: uvicorn --host=0.0.0.0 --port=$PORT gerenciador_tarefas.gerencidador:app
