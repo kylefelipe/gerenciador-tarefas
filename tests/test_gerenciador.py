@@ -1,6 +1,8 @@
 from starlette.testclient import TestClient
 from gerenciador_tarefas.gerenciador import app, TAREFAS
 
+# Testando o GET
+
 def test_quando_listar_tarefas_devo_ter_como_retorno_de_status200():
     cliente = TestClient(app)
     resposta = cliente.get("/tarefas")
@@ -43,3 +45,27 @@ def test_quando_listar_tarefas_a_tarefa_retornada_deve_possuir_um_estado():
     resposta = cliente.get("/tarefas")
     assert "estado" in resposta.json().pop()
     TAREFAS.clear()
+
+# Testando o POST
+
+def test_recurso_tarefas_deve_aceitar_o_verbo_post():
+    cliente = TestClient(app)
+    resposta = cliente.post("/tarefas")
+    assert resposta.status_code != 405
+
+def test_quando_uma_tarefa_e_submetida_deve_possuir_um_titulo():
+    cliente = TestClient(app)
+    resposta = cliente.post("/tarefas", json={})
+    assert resposta.status_code == 422
+
+def test_titulo_da_tarefa_deve_possuir_entre_3_e_50_caracteres():
+    cliente = TestClient(app)
+    resposta = cliente.post("/tarefas", json={"titulo": 2 * "*"})
+    assert resposta.status_code == 422
+    resposta = cliente.post("/tarefas", json={"titulo": 51 * "*"})
+    assert resposta.status_code == 422
+
+def test_descricao_da_tarefa_pode_conter_no_maximo_140_caracteres():
+    cliente = TestClient(app)
+    resposta = cliente.post("/tarefas", json={"titulo": "titulo", "descicao": "*" * 141})
+    assert resposta.status_code == 422
