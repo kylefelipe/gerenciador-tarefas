@@ -24,6 +24,7 @@ def listar():
 
 @app.post('/tarefas', response_model=Tarefa)
 def criar(tarefa: TarefaEntrada):
+    """Criar DocString"""
     nova_tarefa = tarefa.dict()
     nova_tarefa.update({"id": uuid4()})
     return nova_tarefa
