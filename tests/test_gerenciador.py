@@ -55,6 +55,7 @@ def test_quando_listar_tarefas_a_tarefa_retornada_deve_possuir_um_estado():
 
 # Testando o POST
 
+
 def test_recurso_tarefas_deve_aceitar_o_verbo_post():
     cliente = TestClient(app)
     resposta = cliente.post("/tarefas")
@@ -88,8 +89,12 @@ def test_quando_criar_uma_tarefa_a_mesma_deve_ser_retornada():
     cliente = TestClient(app)
     tarefa = {"titulo": "titulo", "descricao": "descricao"}
     resposta = cliente.post("/tarefas", json=tarefa)
-    print(resposta.json(), "\n", res)
-    assert resposta.json() == tarefa
+    copia_resposta = resposta.json()
+    excluir = ['id', 'estado']
+    for exc in excluir:
+        copia_resposta.pop(exc)
+    print(copia_resposta)
+    assert copia_resposta == tarefa
     TAREFAS.clear()
 
 
@@ -100,4 +105,28 @@ def test_quando_criar_uma_tarefa_seu_id_deve_ser_unico():
     resposta1 = cliente.post("/tarefas", json=tarefa1)
     resposta2 = cliente.post("/tarefas", json=tarefa2)
     assert resposta1.json()["id"] != resposta2.json()["id"]
+    TAREFAS.clear()
+
+
+def test_quando_criar_uma_tarefa_seu_estado_padrao_e_nao_finalizado():
+    cliente = TestClient(app)
+    tarefa = {"titulo": "titulo", "descricao": "descricao"}
+    resposta = cliente.post("/tarefas", json=tarefa)
+    assert resposta.json()["estado"] == "não finalizado"
+    TAREFAS.clear()
+
+def test_quando_criar_uma_tarefa_codigo_de_status_retornado_deve_ser_201():
+    cliente = TestClient(app)
+    tarefa = {"titulo": "titulo", "descricao": "descricao"}
+    resposta = cliente.post("/tarefas", json=tarefa)
+    assert resposta.status_code == 201
+    TAREFAS.clear()
+
+
+def test_quando_criar_uma_nova_tarefa_esta_deve_poersistida():
+    cliente = TestClient(app)
+    tarefa = {"titulo": "titulo", "descricao": "descricao"}
+    resposta = cliente.post("/tarefas", json=tarefa)
+    assert resposta.status_code == 201
+    assert len(TAREFAS) == 1
     TAREFAS.clear()
