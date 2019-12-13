@@ -23,6 +23,16 @@ class Tarefa(TarefaEntrada):
 TAREFAS = []
 
 
+@app.get("/")
+def home():
+    home = {"titulo": "Olá mundo",
+            "descição": "Pagina inicial",
+            "id": "Não IDeressa",
+            "estado": EstadosPossiveis.nao_finalizado
+            }
+    return home
+
+
 @app.get('/tarefas')
 def listar():
     return TAREFAS
