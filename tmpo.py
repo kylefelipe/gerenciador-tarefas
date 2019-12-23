@@ -10,4 +10,25 @@ item = itemgetter('status')
 
 sorted(tarefas, key=itemgetter('status'), reverse=True)
 
+item = itemgetter('titulo')
+filtro = list(filter(lambda tarefa: tarefa['titulo'] == 'tarefa 1', tarefas))
+for i in filtro:
+    print(tarefas.index(i))
 
+
+def retorna_id(lista: list, filtro: list):
+    ids = [lista.index(dado) for dado in filtro]
+    return ids
+
+
+lista_ids = retorna_id(tarefas, filtro)
+
+
+def remove_item(lista_ids: list):
+    for dado in lista_ids:
+        print(dado)
+        tarefas.pop(dado)
+    return tarefas
+
+
+remove_item(retorna_id(tarefas, filtro))

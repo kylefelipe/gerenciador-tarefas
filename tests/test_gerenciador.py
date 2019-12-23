@@ -12,7 +12,7 @@ def test_quando_listar_tarefas_devo_ter_como_retorno_de_status200():
 
 def test_quando_listar_tarefas_formato_deve_ser_json():
     cliente = TestClient(app)
-    resposta =  cliente.get("/tarefas")
+    resposta = cliente.get("/tarefas")
     assert resposta.headers["Content-Type"] == "application/json"
 
 
@@ -70,12 +70,18 @@ def test_quando_uma_tarefa_e_submetida_deve_possuir_um_titulo():
     TAREFAS.clear()
 
 
-def test_titulo_da_tarefa_deve_possuir_entre_3_e_50_caracteres():
+def test_titulo_da_tarefa_deve_possuir_minimo_3_carateres():
     cliente = TestClient(app)
     resposta = cliente.post("/tarefas", json={"titulo": 2 * "*"})
     assert resposta.status_code == 422
+    TAREFAS.clear()
+
+
+def test_titulo_da_tarefa_deve_possuir_maximo_50_caracteres():
+    cliente = TestClient(app)
     resposta = cliente.post("/tarefas", json={"titulo": 51 * "*"})
     assert resposta.status_code == 422
+    TAREFAS.clear()
 
 
 def test_descricao_da_tarefa_pode_conter_no_maximo_140_caracteres():
@@ -123,10 +129,42 @@ def test_quando_criar_uma_tarefa_codigo_de_status_retornado_deve_ser_201():
     TAREFAS.clear()
 
 
-def test_quando_criar_uma_nova_tarefa_esta_deve_poersistida():
+def test_quando_criar_uma_nova_tarefa_esta_deve_persistida():
     cliente = TestClient(app)
     tarefa = {"titulo": "titulo", "descricao": "descricao"}
     resposta = cliente.post("/tarefas", json=tarefa)
     assert resposta.status_code == 201
     assert len(TAREFAS) == 1
+    TAREFAS.clear()
+
+
+def test_quando_deletar_uma_tarefa_existente_deve_retornar_204():
+    client = TestClient(app)
+    tarefa = {"titulo": "titulo1", "descricao": "descricao1"}
+    cria = client.post("/tarefas", json=tarefa)
+    id = cria.json()['id']
+    resposta = client.delete(f"/tarefas/{id}")
+    assert resposta.status_code == 204
+    TAREFAS.clear()
+
+
+def test_buscando_uma_tarefa_unica():
+    client = TestClient(app)
+    id = ''
+    tarefas_teste = [{"titulo": "titulo1", "descricao": "descricao1"},
+                     {"titulo": "titulo2", "descricao": "descricao2"}]
+    for tarefa_cria in tarefas_teste:
+        tarefa = client.post("/tarefas", json=tarefa_cria)
+        id = tarefa.json()['id']
+    assert len(id) == 1
+
+
+def test_quando_deletar_uma_tarefa_inexistente_deve_retornar_404():
+    client = TestClient(app)
+    # tarefas_teste = [{"titulo": "titulo1", "descricao": "descricao1"},
+    #                  {"titulo": "titulo2", "descricao": "descricao2"}]
+    # for tarefa_cria in tarefas_teste:
+    #     client.post("/tarefas", json=tarefa_cria)
+    resposta = client.delete("/tarefas/a54a631a658dsa98asdf987sdf")
+    assert resposta.status_code == 404
     TAREFAS.clear()
